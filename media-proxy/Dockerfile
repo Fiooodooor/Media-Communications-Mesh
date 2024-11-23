@@ -68,7 +68,7 @@ RUN ./configure && \
 
 WORKDIR ${LIBFABRIC_DIR}
 RUN ./autogen.sh && \
-    ./configure && \
+    ./configure --enable-verbs=true && \
     make -j$(nproc) && \
     make install && \
     DESTDIR="${PREFIX_DIR}" make install

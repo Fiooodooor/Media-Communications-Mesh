@@ -21,5 +21,5 @@ PKG_CONFIG_PATH="/usr/local/lib/pkgconfig" pkg-config --exists --print-errors li
 "${BUILD_DIR}/FFmpeg/configure" --enable-shared --enable-mcm "$@"
 popd
 
-prompt "FFmpeg MCM plugin configuration completed."
-prompt "\t${BUILD_DIR}/FFmpeg"
+log_info "FFmpeg MCM plugin configuration completed."
+log_info "\t${BUILD_DIR}/FFmpeg"

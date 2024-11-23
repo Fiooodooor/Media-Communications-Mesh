@@ -23,5 +23,5 @@ git clone --branch "release/${FFMPEG_VER}" --depth 1 https://github.com/FFmpeg/F
 
 patch --directory="${BUILD_DIR}/FFmpeg" -p1 -i <(cat "${SCRIPT_DIR}/${FFMPEG_VER}/"*.patch)
 
-prompt "FFmpeg ${FFMPEG_VER} cloned and patched successfully."
-prompt "\t${BUILD_DIR}/FFmpeg"
+log_info "FFmpeg ${FFMPEG_VER} cloned and patched successfully."
+log_info "\t${BUILD_DIR}/FFmpeg"

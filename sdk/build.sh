@@ -18,4 +18,4 @@ cmake -B "${SCRIPT_DIR}/build" \
 cmake --build "${SCRIPT_DIR}/build" -j
 
 # Install
-run_as_root_user cmake --install "${SCRIPT_DIR}/build"
+$AS_ROOT cmake --install "${SCRIPT_DIR}/build"
