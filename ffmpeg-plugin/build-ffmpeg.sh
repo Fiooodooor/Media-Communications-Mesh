@@ -15,7 +15,7 @@ BUILD_DIR="${BUILD_DIR:-${SCRIPT_DIR}/build}"
 cp -f "${SCRIPT_DIR}/mcm_"* "${BUILD_DIR}/FFmpeg/libavdevice/"
 
 make -C "${BUILD_DIR}/FFmpeg/" -j "$(nproc)"
-$AS_ROOT make -C "${BUILD_DIR}/FFmpeg/" install
+as_root make -C "${BUILD_DIR}/FFmpeg/" install
 
 log_info "FFmpeg MCM plugin build completed."
 log_info "\t${BUILD_DIR}/FFmpeg"

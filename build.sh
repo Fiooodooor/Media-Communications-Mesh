@@ -23,9 +23,9 @@ cmake -B "${BUILD_DIR}" \
 cmake --build "${BUILD_DIR}" -j
 
 # Install
-$AS_ROOT cmake --install "${BUILD_DIR}"
-$AS_ROOT ln -s /usr/lib64/libbpf.so.1 /usr/lib/x86_64-linux-gnu/libbpf.so.1 2>/dev/null || true
-$AS_ROOT ldconfig
+as_root cmake --install "${BUILD_DIR}"
+as_root ln -s /usr/lib64/libbpf.so.1 /usr/lib/x86_64-linux-gnu/libbpf.so.1 2>/dev/null || true
+as_root ldconfig
 
 # Run unit tests
 export LD_LIBRARY_PATH="${PREFIX_DIR}/usr/local/lib:/usr/local/lib64"

@@ -8,9 +8,10 @@ on:
 
 env:
   BUILD_TYPE: Release
+  BUILD_DIR: "${{ github.workspace }}/_build}"
+  PREFIX_DIR: "${{ github.workspace }}/_install}"
   MTL_BUILD_DISABLE_PCAPNG: true
   DEBIAN_FRONTEND: noninteractive
-  INSTALL_USE_CUSTOM_PATH: "true"
 
 permissions:
   contents: read
@@ -30,7 +31,6 @@ jobs:
         runner-os: [ 'ubuntu-22.04' ]
     permissions:
       actions: read
-      contents: read
       security-events: write
     defaults:
       run:
@@ -44,63 +44,66 @@ jobs:
     - name: 'Checkout repository'
       uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
 
-    - name: 'Print Env variables'
-      run: |
-        source scripts/setup_build_env.sh
-        echo '******** NON root ********'
-        env
-        echo '******** AS root ********'
-        $AS_ROOT env
-
-    - name: 'Install dependencies'
+    - name: 'Install OS level dependencies'
       run: eval 'source scripts/setup_build_env.sh && install_package_dependencies'
 
     - name: 'Check local dependencies build cache'
-      id: local-dependencies-cache
-      uses: actions/cache@6849a6489940f00c2f30c0fb92c6274307ccb58a # v4.1.2
+      id: load-local-dependencies-cache
+      uses: actions/cache/save@6849a6489940f00c2f30c0fb92c6274307ccb58a # v4.1.2
       with:
-        path: ${{ github.workspace }}/_build/_install
+        path: ${{ env.BUILD_DIR }}
         key: ${{ runner.os }}-${{ hashFiles('versions.env') }}-${{ hashFiles('scripts/setup*.sh') }}
 
+    - name: 'Download, unpack and patch build dependencies'
+      if: steps.load-local-dependencies-cache.outputs.cache-hit != 'true'
+      run: eval 'source scripts/setup_build_env.sh && get_download_unpack_dependencies'
+
     - name: 'Build and Install xdp and libbpf'
-      if: steps.local-dependencies-cache.outputs.cache-hit != 'true'
+      if: steps.load-local-dependencies-cache.outputs.cache-hit != 'true'
       run: eval 'source scripts/setup_build_env.sh && lib_install_xdp_bpf_tools'
 
     - name: 'Build and Install libfabric'
-      if: steps.local-dependencies-cache.outputs.cache-hit != 'true'
+      if: steps.load-local-dependencies-cache.outputs.cache-hit != 'true'
       run: eval 'source scripts/setup_build_env.sh && lib_install_fabrics'
 
-    - name: 'Download the DPDK and MTL'
-      if: steps.local-dependencies-cache.outputs.cache-hit != 'true'
-      run: eval 'source scripts/setup_build_env.sh && lib_download_mtl_and_dpdk'
-
     - name: 'Build and Install the DPDK'
-      if: steps.local-dependencies-cache.outputs.cache-hit != 'true'
+      if: steps.load-local-dependencies-cache.outputs.cache-hit != 'true'
       run: eval 'source scripts/setup_build_env.sh && lib_install_dpdk'
 
     - name: 'Build and Install the MTL'
-      if: steps.local-dependencies-cache.outputs.cache-hit != 'true'
+      if: steps.load-local-dependencies-cache.outputs.cache-hit != 'true'
       run: eval 'source scripts/setup_build_env.sh && lib_install_mtl'
 
     - name: 'Build and Install JPEG XS'
-      if: steps.local-dependencies-cache.outputs.cache-hit != 'true'
+      if: steps.load-local-dependencies-cache.outputs.cache-hit != 'true'
       run: eval 'source scripts/setup_build_env.sh && lib_install_jpeg_xs'
 
     - name: 'Build and Install JPEG XS ffmpeg plugin'
-      if: steps.local-dependencies-cache.outputs.cache-hit != 'true'
+      if: steps.load-local-dependencies-cache.outputs.cache-hit != 'true'
       run: eval 'source scripts/setup_build_env.sh && lib_install_mtl_jpeg_xs_plugin'
 
     - name: 'Build gRPC and dependencies'
-      if: steps.local-dependencies-cache.outputs.cache-hit != 'true'
+      if: steps.load-local-dependencies-cache.outputs.cache-hit != 'true'
       run: eval 'source scripts/setup_build_env.sh && lib_install_grpc'
 
     - name: 'Save local dependencies build cache'
-      if: steps.local-dependencies-cache.outputs.cache-hit != 'true'
-      id: local-dependencies-save-cache
+      if: steps.load-local-dependencies-cache.outputs.cache-hit != 'true'
+      id: save-local-dependencies-cache
       uses: actions/cache/save@6849a6489940f00c2f30c0fb92c6274307ccb58a # v4.1.2
       with:
-        path: ${{ github.workspace }}/_build/_install
-        key: ${{ steps.local-dependencies-cache.outputs.cache-primary-key }}
+        path: ${{ env.BUILD_DIR }}
+        key: ${{ runner.os }}-${{ hashFiles('versions.env') }}-${{ hashFiles('scripts/setup*.sh') }}
+
+    - name: 'Build  and install MCM SDK'
+      run: eval 'source scripts/setup_build_env.sh && lib_build_install_sdk_mcm'
+
+    - name: 'Clone and patch FFmpeg source code'
+      working-directory: ${{ github.workspace }}/ffmpeg-plugin
+      run: ./clone-and-patch-ffmpeg.sh
+
+    - name: 'Configure FFmpeg with MCM plugin'
+      working-directory: ${{ github.workspace }}/ffmpeg-plugin
+      run: ./configure-ffmpeg.sh
 
     - name: 'Initialize CodeQL'
       uses: github/codeql-action/init@b611370bb5703a7efb587f9d136a52ea24c5c38c # v3.25.11

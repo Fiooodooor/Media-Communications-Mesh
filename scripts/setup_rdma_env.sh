@@ -5,7 +5,10 @@ set +x
 
 SCRIPT_DIR="$(readlink -f "$(dirname -- "${BASH_SOURCE[0]}")")"
 REPO_DIR="$(readlink -f "${SCRIPT_DIR}/..")"
+BUILD_DIR="${BUILD_DIR:-${REPO_DIR}/_build}"
+DRIVERS_DIR="${DRIVERS_DIR:-/opt/intel/drivers}"
 WORKING_DIR="${BUILD_DIR:-${REPO_DIR}/build/rdma}"
+PERF_DIR="${DRIVERS_DIR}/perftest"
 
 . "${SCRIPT_DIR}/setup_build_env.sh"
 

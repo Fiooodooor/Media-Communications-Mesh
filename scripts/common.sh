@@ -6,14 +6,6 @@
 COMMON_SCRIPT_DIR="$(readlink -f "$(dirname -- "${BASH_SOURCE[0]}")")"
 REPO_DIR="$(readlink -f "${COMMON_SCRIPT_DIR}/..")"
 
-export BUILD_DIR="${BUILD_DIR:-${REPO_DIR}/_build}"
-export DRIVERS_DIR="${DRIVERS_DIR:-/opt/intel/drivers}"
-
-export ICE_DIR="${DRIVERS_DIR}/ice/${ICE_VER}"
-export IAVF_DIR="${DRIVERS_DIR}/iavf/${IAVF_VER}"
-export IRDMA_DIR="${DRIVERS_DIR}/irdma/${IRDMA_VER}"
-export PERF_DIR="${DRIVERS_DIR}/perftest"
-
 if ! grep "/root/.local/bin" <<< "${PATH}" > /dev/null 2>&1; then
     export PATH="/root/.local/bin:/root/bin:/root/usr/bin:${PATH}"
     export PKG_CONFIG_PATH="/usr/lib/pkgconfig:/usr/local/lib/pkgconfig:/usr/lib64/pkgconfig:/usr/local/lib/x86_64-linux-gnu/pkgconfig:${PKG_CONFIG_PATH}"
@@ -160,8 +152,9 @@ function command_exists {
     command -v "$@" > /dev/null 2>&1
 }
 
-function check_and_set_root_user_access()
+function as_root()
 {
+    CMD_TO_EVALUATE="$*"
     CURRENT_USER_ID="$(id -u)"
     EFECTIVE_USER_ID="${EUID:-$CURRENT_USER_ID}"
     AS_ROOT="/bin/bash -c"
@@ -179,7 +172,7 @@ function check_and_set_root_user_access()
             exit 1
         fi
     fi
-    export AS_ROOT
+    $AS_ROOT "${CMD_TO_EVALUATE[*]}"
 }
 
 function github_api_call() {

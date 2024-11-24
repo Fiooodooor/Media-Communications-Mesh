@@ -20,4 +20,4 @@ cmake -B "${SCRIPT_DIR}/out" \
 cmake --build "${SCRIPT_DIR}/out" -j
 
 # Install
-$AS_ROOT cmake --install "${SCRIPT_DIR}/out"
+as_root cmake --install "${SCRIPT_DIR}/out"
