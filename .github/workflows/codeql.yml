@@ -101,7 +101,6 @@ jobs:
       run: eval 'source scripts/setup_build_env.sh && as_root ffmpeg-plugin/clone-and-patch-ffmpeg.sh'
 
     - name: 'Configure FFmpeg with MCM plugin'
-      working-directory: ${{ github.workspace }}/ffmpeg-plugin
       run: eval 'source scripts/setup_build_env.sh && as_root ffmpeg-plugin/configure-ffmpeg.sh'
       
     - name: 'Initialize CodeQL'
