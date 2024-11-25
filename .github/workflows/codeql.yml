@@ -79,6 +79,17 @@ jobs:
     - name: 'Build gRPC and dependencies'
       run: eval 'source scripts/setup_build_env.sh && lib_install_grpc'
 
+    - name: 'Build and install MCM SDK'
+      run: eval 'source scripts/setup_build_env.sh && lib_build_install_sdk_mcm'
+      env:
+        PREFIX_DIR: "/usr/local"
+
+    - name: 'Clone and patch FFmpeg 7.0 source code'
+      run: eval 'source scripts/setup_build_env.sh && as_root ffmpeg-plugin/clone-and-patch-ffmpeg.sh'
+      env:
+        BUILD_DIR: "${{ github.workspace }}/_build/7-0-ffmpeg"
+        FFMPEG_VER: "7.0"
+
     - name: 'Save local dependencies build cache'
       if: steps.load-local-dependencies-cache.outputs.cache-hit != 'true'
       id: save-local-dependencies-cache
@@ -86,12 +97,6 @@ jobs:
       with:
         path: ${{ env.BUILD_DIR }}
         key: ${{ runner.os }}-${{ hashFiles('versions.env') }}-${{ hashFiles('scripts/setup*.sh') }}
-
-    - name: 'Build  and install MCM SDK'
-      run: eval 'source scripts/setup_build_env.sh && lib_build_install_sdk_mcm'
-
-    - name: 'Clone and patch FFmpeg source code'
-      run: eval 'source scripts/setup_build_env.sh && as_root ffmpeg-plugin/clone-and-patch-ffmpeg.sh'
 
     - name: 'Configure FFmpeg with MCM plugin'
       run: eval 'source scripts/setup_build_env.sh && as_root ffmpeg-plugin/configure-ffmpeg.sh'
