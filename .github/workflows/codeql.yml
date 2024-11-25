@@ -79,17 +79,6 @@ jobs:
     - name: 'Build gRPC and dependencies'
       run: eval 'source scripts/setup_build_env.sh && lib_install_grpc'
 
-    - name: 'Build and install MCM SDK'
-      run: eval 'source scripts/setup_build_env.sh && lib_build_install_sdk_mcm'
-      env:
-        PREFIX_DIR: "/usr/local"
-
-    - name: 'Clone and patch FFmpeg 7.0 source code'
-      run: eval 'source scripts/setup_build_env.sh && as_root ffmpeg-plugin/clone-and-patch-ffmpeg.sh'
-      env:
-        BUILD_DIR: "${{ github.workspace }}/_build/7-0-ffmpeg"
-        FFMPEG_VER: "7.0"
-
     - name: 'Save local dependencies build cache'
       if: steps.load-local-dependencies-cache.outputs.cache-hit != 'true'
       id: save-local-dependencies-cache
@@ -97,9 +86,6 @@ jobs:
       with:
         path: ${{ env.BUILD_DIR }}
         key: ${{ runner.os }}-${{ hashFiles('versions.env') }}-${{ hashFiles('scripts/setup*.sh') }}
-
-    - name: 'Configure FFmpeg with MCM plugin'
-      run: eval 'source scripts/setup_build_env.sh && as_root ffmpeg-plugin/configure-ffmpeg.sh'
       
     - name: 'Initialize CodeQL'
       uses: github/codeql-action/init@b611370bb5703a7efb587f9d136a52ea24c5c38c # v3.25.11
@@ -109,10 +95,6 @@ jobs:
 
     - name: 'Build MCM SDK and Media Proxy'
       run: ./build.sh
-
-    - name: 'Build MCM FFmpeg plugin'
-      working-directory: ${{ github.workspace }}/ffmpeg-plugin
-      run: eval 'source scripts/setup_build_env.sh && as_root ffmpeg-plugin/build-ffmpeg.sh'
 
     - name: 'Perform CodeQL Analysis'
       uses: github/codeql-action/analyze@b611370bb5703a7efb587f9d136a52ea24c5c38c # v3.25.11
