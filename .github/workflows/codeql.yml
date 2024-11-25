@@ -59,31 +59,24 @@ jobs:
       run: eval 'source scripts/setup_build_env.sh && get_download_unpack_dependencies'
 
     - name: 'Build and Install xdp and libbpf'
-      if: steps.load-local-dependencies-cache.outputs.cache-hit != 'true'
       run: eval 'source scripts/setup_build_env.sh && lib_install_xdp_bpf_tools'
 
     - name: 'Build and Install libfabric'
-      if: steps.load-local-dependencies-cache.outputs.cache-hit != 'true'
       run: eval 'source scripts/setup_build_env.sh && lib_install_fabrics'
 
     - name: 'Build and Install the DPDK'
-      if: steps.load-local-dependencies-cache.outputs.cache-hit != 'true'
       run: eval 'source scripts/setup_build_env.sh && lib_install_dpdk'
 
     - name: 'Build and Install the MTL'
-      if: steps.load-local-dependencies-cache.outputs.cache-hit != 'true'
       run: eval 'source scripts/setup_build_env.sh && lib_install_mtl'
 
     - name: 'Build and Install JPEG XS'
-      if: steps.load-local-dependencies-cache.outputs.cache-hit != 'true'
       run: eval 'source scripts/setup_build_env.sh && lib_install_jpeg_xs'
 
     - name: 'Build and Install JPEG XS ffmpeg plugin'
-      if: steps.load-local-dependencies-cache.outputs.cache-hit != 'true'
       run: eval 'source scripts/setup_build_env.sh && lib_install_mtl_jpeg_xs_plugin'
 
     - name: 'Build gRPC and dependencies'
-      if: steps.load-local-dependencies-cache.outputs.cache-hit != 'true'
       run: eval 'source scripts/setup_build_env.sh && lib_install_grpc'
 
     - name: 'Save local dependencies build cache'
